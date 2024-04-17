@@ -29,18 +29,26 @@ import Resizer from "@meghoshpritam/react-image-file-resizer";
 
  
 
-  useEffect(()=>{ //read database data
-    // const readData = async()=>{
-    //   await getDocs(collection(db, "images")).then((querySnap)=>{
-    //     querySnap.docs.map(doc=>{
-    //       console.log(doc.data())
-    //     })
-    //   })
-    // }
+  useEffect(()=>{
+    const handleOnlineStatus = () => {
+      if (navigator.onLine) {
+        console.log("Site is online");
+        // alert("Site is online");
+      } else {
+        console.log("Site is offline");
+        alert("Site is offline");
+      }
+    };
 
-    // hello
+    handleOnlineStatus();
 
-    // readData();
+    window.addEventListener("online", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus);
+
+    return () => {
+      window.removeEventListener("online", handleOnlineStatus);
+      window.removeEventListener("offline", handleOnlineStatus);
+    };
   },[])
 
   

@@ -119,6 +119,28 @@ function Projectobservation() {
       },[]);
 
     useEffect(() => {
+        const handleOnlineStatus = () => {
+            if (navigator.onLine) {
+                console.log("Site is online");
+                // alert("Site is online");
+            } else {
+                console.log("Site is offline");
+                alert("Site is offline");
+            }
+        };
+
+        handleOnlineStatus();
+
+        window.addEventListener("online", handleOnlineStatus);
+        window.addEventListener("offline", handleOnlineStatus);
+
+        return () => {
+            window.removeEventListener("online", handleOnlineStatus);
+            window.removeEventListener("offline", handleOnlineStatus);
+        };
+    },[])
+
+    useEffect(() => {
         getstartlocation()
       },[]);  
 
