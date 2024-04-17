@@ -83,40 +83,47 @@ self.addEventListener('sync', event=>{
         event.waitUntil(
             readAllData('sync-posts')
             .then((data)=>{
-                console.log('the data coming in sw.js is:')
-                console.log(data[0])
 
-                let imageFiles = data[0].images;
+                console.log('all data from sync-posts')
+                console.log(data)
 
-                let rawData = { lat: data[0].latitude, long: data[0].longitude, desc: data[0].description };
+                for (let dt of data) {
+                    console.log('the data coming in sw.js is:')
+                    console.log(data[0])
 
-                let formData = new FormData();
+                    let imageFiles = dt.images;
 
-                // Append non-file data
-                for (let key in rawData) {
-                    formData.append(key, rawData[key]);
+                    let rawData = { lat: dt.latitude, long: dt.longitude, desc: dt.description };
+
+                    let formData = new FormData();
+
+                    // Append non-file data
+                    for (let key in rawData) {
+                        formData.append(key, rawData[key]);
+                    }
+
+                    imageFiles.map(file => {
+                        formData.append('images', file);
+                    })
+                    // formData.append('images', imageFiles)
+
+                    console.log('before fetching')
+
+                    fetch('http://localhost:5000/checkingData', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(res => res.json())
+                        .then(dataFromServer => {
+                            deleteItemFromData('sync-posts', dt.id);
+                            console.log('data got back from server');
+                            console.log(dataFromServer);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
                 }
-
-                imageFiles.map(file=>{
-                    formData.append('images', file);
-                })
-                // formData.append('images', imageFiles)
-
-                console.log('before fetching')
-
-                fetch('http://localhost:5000/checkingData', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(dataFromServer => {
-                    deleteItemFromData('sync-posts', data[0].id);
-                    console.log('data got back from server');
-                    console.log(dataFromServer);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                
             })
         )
     }
